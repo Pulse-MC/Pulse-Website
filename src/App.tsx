@@ -8,7 +8,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/download/:version?/:build_number?" element={<DevBuilds />} />
+        <Route path="/devbuilds/:version?/:build_number?" element={<DevBuilds />} />
         <Route path="/devbuilds" element={<DevBuilds />} />
         <Route path="/releases/:version?/:build_number?" element={<Releases />} />
       </Routes>

@@ -1,9 +1,6 @@
 import { lazy, Suspense, useState } from 'react';
 import { motion } from 'framer-motion';
 import Hero from '../components/LandingPage/Hero';
-import MagicBento from '../components/global/Features';
-import ChromaGrid from '../components/global/ChomaCard';
-import { Layers, Zap } from 'lucide-react';
 
 const Features = lazy(() => import('../components/LandingPage/Features'));
 const Comparison = lazy(() => import('../components/LandingPage/Comparison'));
@@ -28,19 +25,6 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <Hero onDownloadClick={() => setIsDownloadModalOpen(true)} />
-
-      {/* <Suspense fallback={<LoadingSpinner />}>
-        <div className="w-full flex justify-center px-4 py-12">
-          <div className="max-w-7xl mx-auto w-full">
-            <MagicBento
-            enableStars={false}
-            glowColor={[255, 41, 41]}
-            borde
-            // clickEffect
-            />
-          </div>
-        </div>
-      </Suspense> */}
 
       <Suspense>
         <Features />
