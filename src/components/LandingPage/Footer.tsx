@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="absolute bottom-0 left-0 right-0 h-[500px] bg-gradient-to-t from-[#ff2929]/20 via-[#ff2929]/5 to-transparent pointer-events-none z-0" />
 
       <div className="max-w-7xl mx-auto px-4 relative z-10">
-        <div className="grid md:grid-cols-4 gap-12 mb-20">
+        <div className="grid md:grid-cols-4 gap-12 mb-12">
 
           <div className="md:col-span-2">
             <a href="/" className="inline-block mb-6">
@@ -44,6 +44,19 @@ export default function Footer() {
               <FooterLink href="https://github.com/Pulse-MC/.github/tree/main/assets" isExternal>Brand Assets</FooterLink>
             </ul>
           </div>
+        </div>
+
+        <div className="mb-6 flex items-center gap-1 text-sm text-gray-400">
+          <span>Pulse is</span>
+          <a 
+            href="https://github.com/Pulse-MC/Website"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-0.5 hover:text-[#ff2929] transition-colors font-medium text-[#ff2929]"
+          >
+            open source.
+            <ArrowUpRight size={12} className="opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" />
+          </a>
         </div>
 
         <div className="border-t border-white/10 pt-8 pb-32 md:pb-40 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
