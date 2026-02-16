@@ -1,247 +1,22 @@
-import React, { useRef, useState, useEffect, forwardRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Server, 
-  Cpu, 
-  Zap, 
-  Network, 
-  Terminal, 
-  Layers, 
-  Box, 
-  Activity 
-} from "lucide-react";
+import { Server, Zap, Terminal, Activity, Monitor, Cpu, Layers } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { AnimatedBeam } from "@/components/ui/animated-beam"; 
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const NodeIcon = forwardRef<HTMLDivElement, { icon: any; color?: string; label: string; active?: boolean; shake?: boolean }>(
-  ({ icon: Icon, color = "text-gray-500", label, active = false, shake = false }, ref) => {
-    return (
-      <div ref={ref} className="z-10 flex flex-col items-center relative bg-transparent p-2">
-        <motion.div
-          animate={shake ? { 
-            x: [-2, 2, -2, 2, 0], 
-            filter: ["brightness(1)", "brightness(2)", "brightness(1)"],
-          } : {}}
-          transition={{ duration: 0.2 }}
-          className={cn(
-            "relative flex h-12 w-12 items-center justify-center rounded-xl border bg-black shadow-xl transition-all duration-300",
-            active ? "border-[#ff2929] bg-[#ff2929]/10 shadow-[0_0_20px_rgba(255,41,41,0.3)]" : "border-white/10"
-          )}
-        >
-          <Icon className={cn("h-6 w-6 transition-colors duration-300", active ? "text-[#ff2929]" : color)} />
-        </motion.div>
-        <span className="mt-2 text-[10px] uppercase tracking-wider font-mono text-gray-500 whitespace-nowrap">
-          {label}
-        </span>
-      </div>
-    );
-  }
-);
-NodeIcon.displayName = "NodeIcon";
-
-const CpuVisualization = () => {
-  const vanillaContainerRef = useRef<HTMLDivElement>(null);
-  const pulseContainerRef = useRef<HTMLDivElement>(null);
-
-  const logicRefV = useRef<HTMLDivElement>(null);
-  const cpuRefV = useRef<HTMLDivElement>(null);
-  const netRefV = useRef<HTMLDivElement>(null);
-
-  const logicRefP = useRef<HTMLDivElement>(null);
-  const bufferRefP = useRef<HTMLDivElement>(null);
-  const cpuRefP = useRef<HTMLDivElement>(null);
-  const netRefP = useRef<HTMLDivElement>(null);
-
-  const [vanillaStress, setVanillaStress] = useState(false);
-  const [bufferSize, setBufferSize] = useState(1);
-  const [pulseBeam1, setPulseBeam1] = useState(false);
-  const [pulseBeam2, setPulseBeam2] = useState(false);
-  const [cpuPulseActive, setCpuPulseActive] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setVanillaStress((prev) => !prev);
-    }, 150); 
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const fillInterval = setInterval(() => {
-      setBufferSize(prev => (prev < 1.3 ? prev + 0.05 : 1));
-    }, 100);
-
-    const flushInterval = setInterval(() => {
-      setPulseBeam1(true);
-      setBufferSize(1);
-
-      setTimeout(() => {
-        setCpuPulseActive(true);
-      }, 400);
-
-      setTimeout(() => {
-        setPulseBeam2(true);
-      }, 500); 
-
-      setTimeout(() => {
-        setPulseBeam1(false);
-      }, 700);
-
-      setTimeout(() => {
-        setCpuPulseActive(false);
-        setPulseBeam2(false);
-      }, 1200);
-
-    }, 2500);
-
-    return () => {
-      clearInterval(fillInterval);
-      clearInterval(flushInterval);
-    };
-  }, []);
-
-  return (
-    <div className="grid grid-cols-1 gap-8 w-full max-w-5xl mx-auto font-sans">
-      
-      <div className="relative flex flex-col items-center h-[240px] border border-white/10 rounded-3xl bg-neutral-900/50 p-6 overflow-hidden">
-        <div className="w-full flex justify-between items-start mb-8 z-20 px-4">
-            <div>
-                <h3 className="text-xl font-bold text-gray-200">Vanilla</h3>
-                <p className="text-xs text-gray-500 mt-1">Direct unbuffered calls</p>
-            </div>
-            <div className="flex flex-col items-end">
-                <p className="text-[10px] font-mono text-gray-500 mb-1">CPU INTERRUPTS</p>
-                <div className="text-xs text-[#ff2929] font-mono border border-[#ff2929]/20 bg-[#ff2929]/10 px-2 py-1 rounded animate-pulse">
-                    CRITICAL
-                </div>
-            </div>
-        </div>
-
-        <div ref={vanillaContainerRef} className="flex flex-row items-center justify-between w-full px-4 md:px-12 relative flex-1">
-            <AnimatedBeam 
-                containerRef={vanillaContainerRef} 
-                fromRef={logicRefV} 
-                toRef={cpuRefV} 
-                duration={0.3} 
-                gradientStartColor="#ff2929" 
-                gradientStopColor="#ff5555"
-            />
-
-            <AnimatedBeam 
-                containerRef={vanillaContainerRef} 
-                fromRef={cpuRefV} 
-                toRef={netRefV} 
-                duration={0.3}
-                gradientStartColor="#ff2929" 
-                gradientStopColor="#555" 
-            />
-
-            <NodeIcon ref={logicRefV} icon={Box} label="Game Logic" />
-            
-            <div className="relative">
-                <NodeIcon 
-                    ref={cpuRefV} 
-                    icon={Cpu} 
-                    label="CPU" 
-                    active={vanillaStress} 
-                    shake={vanillaStress} 
-                />
-                <div className={cn("absolute -top-8 left-1/2 -translate-x-1/2 text-[10px] font-bold text-[#ff2929] font-mono whitespace-nowrap transition-opacity duration-100", vanillaStress ? "opacity-100" : "opacity-0")}>
-                    IRQ!
-                </div>
-            </div>
-
-            <NodeIcon ref={netRefV} icon={Network} label="Network" />
-        </div>
-      </div>
-
-      <div className="relative flex flex-col items-center h-[240px] border border-white/10 rounded-3xl bg-neutral-900/50 p-6 overflow-hidden">
-        <div className="w-full flex justify-between items-start mb-8 z-20 px-4">
-            <div>
-                <h3 className="text-xl font-bold text-gray-200">Pulse</h3>
-                <p className="text-xs text-gray-500 mt-1">Batched buffer processing</p>
-            </div>
-             <div className="flex flex-col items-end">
-                <p className="text-[10px] font-mono text-gray-500 mb-1">CPU LOAD</p>
-                <div className="text-xs text-emerald-500 font-mono border border-emerald-500/20 bg-emerald-500/10 px-2 py-1 rounded">
-                    OPTIMAL
-                </div>
-            </div>
-        </div>
-
-        <div ref={pulseContainerRef} className="flex flex-row items-center justify-between w-full px-4 md:px-12 relative flex-1">
-             <AnimatedBeam 
-                containerRef={pulseContainerRef} 
-                fromRef={logicRefP} 
-                toRef={bufferRefP} 
-                duration={1.5} 
-                gradientStartColor="#374151" 
-                gradientStopColor="#10b981" 
-            />
-
-            {pulseBeam1 && (
-                <AnimatedBeam 
-                    containerRef={pulseContainerRef} 
-                    fromRef={bufferRefP} 
-                    toRef={cpuRefP} 
-                    duration={0.6}
-                    gradientStartColor="#10b981" 
-                    gradientStopColor="#10b981" 
-                    pathWidth={4}
-                />
-            )}
-
-            {pulseBeam2 && (
-                <AnimatedBeam 
-                    containerRef={pulseContainerRef} 
-                    fromRef={cpuRefP} 
-                    toRef={netRefP} 
-                    duration={0.6}
-                    gradientStartColor="#10b981" 
-                    gradientStopColor="#10b981" 
-                    pathWidth={4}
-                />
-            )}
-
-            <NodeIcon ref={logicRefP} icon={Box} label="Game Logic" />
-
-            <div className="relative flex items-center justify-center">
-                <motion.div 
-                    animate={{ scale: bufferSize }}
-                    className="absolute w-12 h-12 bg-emerald-500/5 rounded-full border border-emerald-500/30"
-                />
-                <NodeIcon 
-                    ref={bufferRefP} 
-                    icon={Layers} 
-                    label="Buffer" 
-                    color="text-emerald-500" 
-                    active={bufferSize > 1.2}
-                />
-                <div className="absolute -top-6 text-[10px] text-emerald-500/80 font-mono">
-                    {pulseBeam1 ? "FLUSHING..." : "ACCUMULATING"}
-                </div>
-            </div>
-
-            <NodeIcon 
-                ref={cpuRefP} 
-                icon={Cpu} 
-                label="CPU" 
-                active={cpuPulseActive} 
-                color={cpuPulseActive ? "text-emerald-500" : "text-gray-600"} 
-            />
-            
-            <NodeIcon ref={netRefP} icon={Network} label="Network" />
-        </div>
-      </div>
-    </div>
-  );
+type LogEntry = {
+  id: string;
+  text: string;
+  time: string;
 };
 
+type Packet = {
+  id: string;
+};
 
 const LOG_DATA = [
     "[DEBUG] Zombie spawned (ID: 402)",
@@ -252,73 +27,105 @@ const LOG_DATA = [
 ];
 
 const ConsoleDemo = () => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const serverRef = useRef<HTMLDivElement>(null);
-    const clientRef = useRef<HTMLDivElement>(null);
-    const [vanillaLogs, setVanillaLogs] = useState<string[]>([]);
-    const [pulseLogs, setPulseLogs] = useState<string[]>([]);
-    const [isAnimating, setIsAnimating] = useState(false);
+    const isMounted = useRef(true);
 
-    const [flyingPacketsV, setFlyingPacketsV] = useState<number[]>([]);
-
+    const [vanillaLogs, setVanillaLogs] = useState<LogEntry[]>([]);
+    const [pulseLogs, setPulseLogs] = useState<LogEntry[]>([]);
+    const [flyingPacketsV, setFlyingPacketsV] = useState<Packet[]>([]);
     const [pulseBeam, setPulseBeam] = useState(false);
 
     useEffect(() => {
+        isMounted.current = true;
+
         const runSimulation = async () => {
-            setIsAnimating(true);
-            setVanillaLogs([]);
-            setPulseLogs([]);
+            while (isMounted.current) {
+                setVanillaLogs([]);
+                setPulseLogs([]);
+                setFlyingPacketsV([]);
+                setPulseBeam(false);
 
-            for (let i = 0; i < LOG_DATA.length; i++) {
-                setFlyingPacketsV(prev => [...prev, i]);
+                await new Promise(r => setTimeout(r, 500));
+                if (!isMounted.current) break;
 
-                await new Promise(r => setTimeout(r, 300));
+                for (let i = 0; i < LOG_DATA.length; i++) {
+                    if (!isMounted.current) break;
 
-                setVanillaLogs(prev => Array.from(new Set([...prev, LOG_DATA[i]])));
-                setFlyingPacketsV(prev => prev.filter(id => id !== i));
+                    const packetId = `pkt-${crypto.randomUUID()}-${i}`;
+                    setFlyingPacketsV(prev => [...prev, { id: packetId }]);
 
-                await new Promise(r => setTimeout(r, 150));
+                    await new Promise(r => setTimeout(r, 300));
+                    if (!isMounted.current) break;
+
+                    const newLog: LogEntry = {
+                        id: `log-v-${crypto.randomUUID()}-${i}`,
+                        text: LOG_DATA[i],
+                        time: new Date().toLocaleTimeString('en-US', { hour12: false })
+                    };
+
+                    setVanillaLogs(prev => {
+                        if (prev.some(l => l.text === newLog.text)) return prev;
+                        return [...prev, newLog];
+                    });
+                    
+                    setFlyingPacketsV(prev => prev.filter(p => p.id !== packetId));
+
+                    await new Promise(r => setTimeout(r, 150));
+                }
+
+                if (!isMounted.current) break;
+
+                await new Promise(r => setTimeout(r, 1000));
+                if (!isMounted.current) break;
+
+                setPulseBeam(true);
+
+                await new Promise(r => setTimeout(r, 600));
+                if (!isMounted.current) break;
+
+                const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false });
+                const batchLogs = LOG_DATA.map((text, idx) => ({
+                    id: `log-p-${crypto.randomUUID()}-${idx}`,
+                    text,
+                    time: currentTime
+                }));
+
+                setPulseLogs(batchLogs);
+                setPulseBeam(false);
+
+                await new Promise(r => setTimeout(r, 3000));
             }
-
-            await new Promise(r => setTimeout(r, 1000));
-
-            setPulseBeam(true);
-
-            await new Promise(r => setTimeout(r, 600));
-
-            setPulseLogs(LOG_DATA);
-            setPulseBeam(false);
-
-            await new Promise(r => setTimeout(r, 2000));
-            runSimulation();
         };
 
         runSimulation();
-        return () => {}; 
+
+        return () => {
+            isMounted.current = false;
+        }; 
     }, []);
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full mt-12" ref={containerRef}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full mt-12">
 
-            <div className="bg-black/40 border border-white/10 rounded-xl p-4 flex flex-col gap-4">
+            <div className="bg-black/40 border border-white/10 rounded-xl p-4 flex flex-col gap-4 overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-gray-400 font-mono text-xs">VANILLA (PAPER)</span>
                     <Activity size={14} className="text-[#ff2929]" />
                 </div>
                 
                 <div className="flex items-center justify-between px-4 h-20 relative">
-                    <div ref={serverRef} className="z-10 bg-black border border-gray-700 p-2 rounded-lg">
+                    <div className="z-10 bg-black border border-gray-700 p-2 rounded-lg">
                         <Server size={20} className="text-gray-400" />
                     </div>
 
                     <div className="flex-1 relative h-full mx-4 overflow-hidden">
                         <div className="absolute top-1/2 w-full h-[1px] bg-gray-800" />
-                        <AnimatePresence>
-                            {flyingPacketsV.map((id) => (
+                        <AnimatePresence mode="popLayout">
+                            {flyingPacketsV.map((packet) => (
                                 <motion.div
-                                    key={id}
+                                    key={packet.id}
                                     initial={{ left: "0%", opacity: 1 }}
                                     animate={{ left: "100%", opacity: 0 }}
+                                    exit={{ opacity: 0 }}
                                     transition={{ duration: 0.3, ease: "linear" }}
                                     className="absolute top-1/2 -mt-1.5 w-3 h-3 bg-[#ff2929] rounded-full shadow-[0_0_10px_#ff2929]"
                                 />
@@ -326,72 +133,80 @@ const ConsoleDemo = () => {
                         </AnimatePresence>
                     </div>
 
-                    <div className="z-10 bg-black border border-gray-700 p-2 rounded-lg">
-                        <MonitorIcon />
+                    <div className="z-10 bg-black border border-gray-700 p-2 rounded-lg text-gray-400">
+                        <Monitor />
                     </div>
                 </div>
 
-                <div className="h-40 bg-[#0a0a0a] rounded border border-white/5 p-3 font-mono text-[10px] md:text-xs text-green-400/80 overflow-hidden font-bold shadow-inner">
-                    <div className="opacity-50 mb-2 border-b border-white/5 pb-1">user@client:~$ tail -f network.log</div>
-                    {vanillaLogs.map((log, i) => (
-                        <motion.div 
-                            key={i}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="mb-1 text-red-400"
-                        >
-                            <span className="text-gray-600">[{new Date().toLocaleTimeString()}]</span> {log}
-                        </motion.div>
-                    ))}
-                    {vanillaLogs.length === 0 && <span className="animate-pulse text-gray-700">Waiting for data...</span>}
+                <div className="h-44 bg-[#0a0a0a] rounded border border-white/5 p-3 font-mono text-[10px] md:text-xs text-green-400/80 overflow-hidden font-bold shadow-inner flex flex-col">
+                    <div className="opacity-50 mb-2 border-b border-white/5 pb-1 shrink-0">user@client:~$ tail -f network.log</div>
+                    <div className="flex flex-col justify-end min-h-0">
+                        {vanillaLogs.map((log) => (
+                            <motion.div 
+                                key={log.id}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className="mb-1 text-red-400 whitespace-nowrap overflow-hidden text-ellipsis"
+                            >
+                                <span className="text-gray-600">[{log.time}]</span> {log.text}
+                            </motion.div>
+                        ))}
+                        {vanillaLogs.length === 0 && <span className="animate-pulse text-gray-700">Waiting for data...</span>}
+                    </div>
                 </div>
             </div>
 
-            <div className="bg-black/40 border border-white/10 rounded-xl p-4 flex flex-col gap-4">
+            <div className="bg-black/40 border border-white/10 rounded-xl p-4 flex flex-col gap-4 overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-gray-400 font-mono text-xs">PULSE SOFTWARE</span>
                     <Zap size={14} className="text-emerald-500" />
                 </div>
 
                 <div className="flex items-center justify-between px-4 h-20 relative">
-                    {pulseBeam && (
-                         <div className="absolute left-12 right-12 top-1/2 h-[4px] -mt-[2px] z-0">
-                             <motion.div 
-                                initial={{ width: "0%" }}
-                                animate={{ width: "100%" }}
-                                transition={{ duration: 0.6, ease: "circIn" }}
-                                className="h-full bg-emerald-500 shadow-[0_0_15px_#10b981]"
-                             />
-                         </div>
-                    )}
+                    <div className="absolute left-12 right-12 top-1/2 h-[4px] -mt-[2px] z-0 overflow-hidden">
+                        <AnimatePresence>
+                            {pulseBeam && (
+                                <motion.div 
+                                    initial={{ width: "0%", opacity: 1 }}
+                                    animate={{ width: "100%" }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.6, ease: "circIn" }}
+                                    className="h-full bg-emerald-500 shadow-[0_0_15px_#10b981]"
+                                />
+                            )}
+                        </AnimatePresence>
+                    </div>
 
                     <div className={cn("z-10 bg-black border p-2 rounded-lg transition-colors duration-500", pulseBeam ? "border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]" : "border-gray-700")}>
                         <Server size={20} className={pulseBeam ? "text-emerald-500" : "text-gray-400"} />
                     </div>
                     
-                    <div className="flex-1 h-full mx-4 flex items-center justify-center">
-                         <span className={cn("text-[10px] font-mono transition-colors", pulseBeam ? "text-emerald-500" : "text-transparent")}>
-                            BATCH SIZE: 4
+                    <div className="flex-1 h-full mx-4 flex items-center justify-center z-10">
+                         <span className={cn("text-[10px] font-mono transition-colors bg-black/50 px-2 rounded", pulseBeam ? "text-emerald-500" : "text-transparent")}>
+                            BATCH SIZE: {LOG_DATA.length}
                          </span>
                     </div>
 
-                    <div ref={clientRef} className={cn("z-10 bg-black border p-2 rounded-lg transition-colors duration-200 delay-500", !pulseBeam && pulseLogs.length > 0 ? "border-emerald-500 bg-emerald-900/20" : "border-gray-700")}>
-                        <MonitorIcon color={!pulseBeam && pulseLogs.length > 0 ? "text-emerald-500" : undefined} />
+                    <div className={cn("z-10 bg-black border p-2 rounded-lg transition-colors duration-200 delay-500", !pulseBeam && pulseLogs.length > 0 ? "border-emerald-500 bg-emerald-900/20 text-emerald-500" : "border-gray-700 text-gray-400")}>
+                        <Monitor />
                     </div>
                 </div>
-                <div className="h-40 bg-[#0a0a0a] rounded border border-white/5 p-3 font-mono text-[10px] md:text-xs text-emerald-400 overflow-hidden font-bold shadow-inner">
-                    <div className="opacity-50 mb-2 border-b border-white/5 pb-1">user@client:~$ tail -f pulse_network.log</div>
-                    {pulseLogs.map((log, i) => (
-                        <motion.div 
-                            key={i}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="mb-1"
-                        >
-                             <span className="text-gray-600">[{new Date().toLocaleTimeString()}]</span> {log}
-                        </motion.div>
-                    ))}
-                    {pulseLogs.length === 0 && <span className="animate-pulse text-gray-700">Buffering state...</span>}
+
+                <div className="h-44 bg-[#0a0a0a] rounded border border-white/5 p-3 font-mono text-[10px] md:text-xs text-emerald-400 overflow-hidden font-bold shadow-inner flex flex-col">
+                    <div className="opacity-50 mb-2 border-b border-white/5 pb-1 shrink-0">user@client:~$ tail -f pulse_network.log</div>
+                    <div className="flex flex-col justify-end min-h-0">
+                        {pulseLogs.map((log) => (
+                            <motion.div 
+                                key={log.id}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="mb-1 whitespace-nowrap overflow-hidden text-ellipsis"
+                            >
+                                <span className="text-gray-600">[{log.time}]</span> {log.text}
+                            </motion.div>
+                        ))}
+                        {pulseLogs.length === 0 && <span className="animate-pulse text-gray-700">Buffering state...</span>}
+                    </div>
                 </div>
             </div>
 
@@ -399,22 +214,123 @@ const ConsoleDemo = () => {
     );
 };
 
-const MonitorIcon = ({ color = "text-gray-400" }) => (
-    <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width="20" height="20" viewBox="0 0 24 24" 
-        fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" 
-        className={color}
-    >
-        <rect width="20" height="14" x="2" y="3" rx="2" />
-        <line x1="8" x2="16" y1="21" y2="21" />
-        <line x1="12" x2="12" y1="17" y2="21" />
-    </svg>
-);
+const CPULoadDemo = () => {
+    const [vInterrupts, setVInterrupts] = useState<number[]>([]);
+    const [pInterrupts, setPInterrupts] = useState<number[]>([]);
+    const [vCount, setVCount] = useState(0);
+    const [pCount, setPCount] = useState(0);
+
+    useEffect(() => {
+        const vInterval = setInterval(() => {
+            const id = crypto.randomUUID();
+            setVInterrupts(prev => [...prev.slice(-10), id]);
+            setVCount(c => c + 1);
+            setTimeout(() => setVInterrupts(prev => prev.filter(i => i !== id)), 600);
+        }, 75);
+
+        const pInterval = setInterval(() => {
+            const id = crypto.randomUUID();
+            setPInterrupts([id]);
+            setPCount(c => c + 1);
+            setTimeout(() => setPInterrupts([]), 800);
+        }, 2000);
+
+        return () => { clearInterval(vInterval); clearInterval(pInterval); };
+    }, []);
+
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full mt-8">
+            <div className="bg-black/40 border border-white/10 rounded-xl p-6 relative overflow-hidden group">
+                <div className="flex items-center justify-between mb-8">
+                    <div className="space-y-1">
+                        <h4 className="text-white font-bold text-sm uppercase tracking-tight">Paper</h4>
+                        <p className="text-[10px] text-red-500/70 font-mono">CPU Overload Risk</p>
+                    </div>
+                    <div className="text-right">
+                        <span className="text-2xl font-mono font-bold text-red-500">{vCount}</span>
+                        <p className="text-[9px] text-gray-500 uppercase">Total Context Switches</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center justify-between relative px-2">
+                    <div className="p-3 bg-white/5 rounded-lg border border-white/10"><Layers className="text-gray-400" size={24} /></div>
+                    
+                    <div className="flex-1 h-20 relative mx-4">
+                        <AnimatePresence>
+                            {vInterrupts.map(id => (
+                                <motion.div
+                                    key={id}
+                                    initial={{ left: "0%", opacity: 0, y: -2 }}
+                                    animate={{ left: "100%", opacity: [0, 1, 1, 0], y: -2 }}
+                                    transition={{ duration: 0.6, ease: "linear" }}
+                                    className="absolute top-1/2 -mt-2 w-4 h-4 bg-red-500/20 rounded flex items-center justify-center"
+                                    style={{ transform: 'translateY(-50%)' }}
+                                >
+                                    <Zap size={8} className="text-red-500 h-full w-full" />
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                        <div className="absolute top-1/2 w-full h-[1px] bg-red-900/20" />
+                    </div>
+
+                    <motion.div 
+                        animate={vInterrupts.length > 0 ? { x: [-1, 1, -1], rotate: [-1, 1, 0] } : {}}
+                        transition={{ repeat: Infinity, duration: 0.1 }}
+                        className={cn("p-4 rounded-xl border transition-colors", vInterrupts.length > 0 ? "bg-red-500/10 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.2)]" : "bg-white/5 border-white/10")}
+                    >
+                        <Cpu className={vInterrupts.length > 0 ? "text-red-500" : "text-gray-500"} size={32} />
+                    </motion.div>
+                </div>
+            </div>
+
+            <div className="bg-black/40 border border-white/10 rounded-xl p-6 relative overflow-hidden">
+                <div className="flex items-center justify-between mb-8">
+                    <div className="space-y-1">
+                        <h4 className="text-white font-bold text-sm uppercase tracking-tight">Pulse</h4>
+                        <p className="text-[10px] text-emerald-500/70 font-mono">Optimized Efficiency</p>
+                    </div>
+                    <div className="text-right">
+                        <span className="text-2xl font-mono font-bold text-emerald-500">{pCount}</span>
+                        <p className="text-[9px] text-gray-500 uppercase">Total Context Switches</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center justify-between relative px-2">
+                    <div className="p-3 bg-white/5 rounded-lg border border-white/10"><Layers className="text-gray-400" size={24} /></div>
+                    
+                    <div className="flex-1 h-20 relative mx-4">
+                        <AnimatePresence>
+                            {pInterrupts.map(id => (
+                                <motion.div
+                                    key={id}
+                                    initial={{ left: "0%", opacity: 0, y: -2 }}
+                                    animate={{ left: "100%", opacity: [0, 1, 1, 0], y: -2 }}
+                                    transition={{ duration: 0.6, ease: "linear" }}
+                                    className="absolute top-1/2 -mt-2 w-4 h-4 bg-emerald-500/20 rounded flex items-center justify-center"
+                                    style={{ transform: 'translateY(-50%)' }}
+                                >
+                                    <Zap size={8} className="text-emerald-500 h-full w-full" />
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                        <div className="absolute top-1/2 w-full h-[1px] bg-emerald-900/20" />
+                    </div>
+
+                    <motion.div 
+                        animate={pInterrupts.length > 0 ? { scale: [1, 1.05, 1] } : {}}
+                        className={cn("p-4 rounded-xl border transition-colors duration-500", pInterrupts.length > 0 ? "bg-emerald-500/10 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.2)]" : "bg-white/5 border-white/10")}
+                    >
+                        <Cpu className={pInterrupts.length > 0 ? "text-emerald-500" : "text-gray-500"} size={32} />
+                    </motion.div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export default function NetworkComparisonSection() {
   return (
-    <section className="relative w-full py-24 px-4 bg-[#050505] overflow-hidden text-white min-h-screen flex flex-col items-center">
+    <section className="relative w-full py-24 px-4 bg-[#050505] overflow-hidden text-white flex flex-col items-center">
       <div 
         className="absolute inset-0 z-0 opacity-20 pointer-events-none"
         style={{
@@ -432,7 +348,7 @@ export default function NetworkComparisonSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-5xl md:text-6xl font-bold text-white mb-4 font-syne"
+            className="text-5xl md:text-6xl font-bold text-white mb-4"
           >
             Data <span className="text-[#ff2929]">Fragmentation</span>
           </motion.h2>
@@ -450,9 +366,15 @@ export default function NetworkComparisonSection() {
         <div>
             <div className="flex items-center gap-2 mb-6">
                 <Terminal className="text-[#ff2929]" size={20} />
-                <h3 className="text-xl font-bold uppercase tracking-wider font-jet text-[#808080]">// Network Replication Jitter</h3>
+                <h3 className="text-xl font-bold uppercase tracking-wider text-[#808080]">// 1. Network Replication Jitter</h3>
             </div>
             <ConsoleDemo />
+
+            <div className="flex items-center gap-2 mb-6 pt-16">
+                <Terminal className="text-[#ff2929]" size={20} />
+                <h3 className="text-xl font-bold uppercase tracking-wider text-[#808080]">// 2. CPU Context Switching</h3>
+            </div>
+            <CPULoadDemo />
         </div>
 
       </div>

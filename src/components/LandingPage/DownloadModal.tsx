@@ -28,12 +28,13 @@ interface ApiRelease {
 }
 
 const PLATFORMS_META: PlatformMeta[] = [
+  { id: 'pulse', name: 'Pulse', description: 'Feature-rich server' },
   { id: 'paper', name: 'Paper', description: 'High-performance server' },
-  { id: 'purpur', name: 'Purpur', description: 'Feature-rich server' },
-  { id: 'fabric', name: 'Fabric', description: 'Lightweight mod loader' },
+  // { id: 'fabric', name: 'Fabric', description: 'Lightweight mod loader' },
+  { id: 'canvas', name: 'Canvas', description: 'Multi-threaded Folia fork for performance' },
+  { id: 'leaf', name: 'Leaf', description: 'High-performance asynchronous core' },
 ];
 
-// --- Компонент Анимации ---
 const DownloadAnimation = ({ onComplete }: { onComplete: () => void }) => {
   const [stage, setStage] = useState<'enter' | 'explode'>('enter');
 
@@ -166,16 +167,24 @@ export default function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
   };
 
   const getDownloadData = () => {
-    const data = releases.find(
+    const matchingReleases = releases.filter(
       (d) => d.version === selectedVersion && d.platform.toLowerCase() === selectedPlatform.toLowerCase()
     );
     
-    if (!data) return null;
+    if (matchingReleases.length === 0) return null;
+
+    const latestBuild = matchingReleases.sort((a, b) => {
+      const buildA = (a.build_id) || 0;
+      const buildB = (b.build_id) || 0;
+      return parseInt(buildB) - parseInt(buildA);
+    })[0];
+
+    if (!latestBuild) return null;
 
     return {
-      link: `https://api.pulsemc.dev/release/download/${data.build_id}` || '404',
-      size: data.size || data.file_size || "0",
-      date: data.releaseDate || data.release_date || new Date().toISOString().split('T')[0]
+      link: `https://api.pulsemc.dev/release/download/${latestBuild.build_id}` || '404',
+      size: latestBuild.size || latestBuild.file_size || "0",
+      date: latestBuild.releaseDate || latestBuild.release_date || new Date().toISOString().split('T')[0]
     };
   };
 

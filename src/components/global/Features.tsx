@@ -2,8 +2,6 @@
   import { gsap } from 'gsap';
   import { Layers, Zap, Package, Network, Activity, Plug } from 'lucide-react';
 
-  // --- Types ---
-
   export interface BentoCardProps {
     title?: string;
     description?: string;
@@ -21,8 +19,6 @@
     damping?: number;
     fadeOut?: number;
   }
-
-  // --- Configuration ---
 
   const MOBILE_BREAKPOINT = 768;
 
@@ -78,12 +74,10 @@
     return isMobile;
   };
 
-  // --- Main Component ---
-
   type SetterFn = (v: number | string) => void;
 
   const MagicBento: React.FC<BentoProps> = ({
-    textAutoHide = false, // По умолчанию текст теперь не скрывается
+    textAutoHide = false,
     disableAnimations = false,
     spotlightRadius = 600,
     spotlightColor = 'rgba(255, 255, 255, 0.25)',
@@ -100,8 +94,6 @@
 
     const isMobile = useMobileDetection();
     const shouldDisableAnimations = disableAnimations || isMobile;
-
-    // --- Chroma / Mouse Tracking Logic ---
     
     useEffect(() => {
       if (shouldDisableAnimations || !rootRef.current) return;
@@ -178,7 +170,6 @@
         ref={rootRef}
         onPointerMove={handleMove}
         onPointerLeave={handleLeave}
-        // Увеличил максимальную ширину до 1400px (max-w-[1400px])
         className="relative w-full max-w-[1400px] mx-auto p-4 group select-none"
         style={{
           '--x': '50%',
@@ -191,13 +182,9 @@
           {`
             .card-responsive {
               display: grid;
-              gap: 1.25rem; /* Немного увеличил отступы */
+              gap: 1.25rem;
               grid-template-columns: 1fr;
               width: 100%;
-              /* 
-                Ключевое изменение: minmax(240px, auto).
-                Это значит "минимум 240px, но если контент больше - растягивайся".
-              */
               grid-auto-rows: minmax(240px, auto); 
             }
             
@@ -212,7 +199,6 @@
                 grid-template-columns: repeat(4, 1fr);
               }
               
-              /* Большие блоки занимают 2 колонки и 2 ряда */
               .card-responsive .bento-card:nth-child(3) {
                 grid-column: span 2;
                 grid-row: span 1;
@@ -223,14 +209,12 @@
                 grid-row: 2 / span 1;
               }
               
-              /* Последний маленький блок встает в 4-ю колонку, 3-й ряд */
               .card-responsive .bento-card:nth-child(6) {
                 grid-column: 4;
                 grid-row: 2;
               }
             }
 
-            /* Классы обрезки текста оставлены опционально, но логика изменена в JSX */
             .text-clamp-1 {
               display: -webkit-box;
               -webkit-box-orient: vertical;
@@ -262,7 +246,6 @@
                     boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
                   }}
                 >
-                  {/* Внутренний подсвет */}
                   <div
                       className="absolute inset-0 pointer-events-none transition-opacity duration-500 opacity-0 group-hover:opacity-100 mix-blend-overlay"
                       style={{
@@ -292,7 +275,6 @@
 
         {!shouldDisableAnimations && (
           <>
-              {/* Слой затемнения */}
               <div
                   className="absolute inset-0 pointer-events-none z-30 rounded-[28px]"
                   style={{
@@ -317,7 +299,6 @@
                   }}
               />
 
-              {/* Слой полного скрытия при уходе мыши */}
               <div
                   ref={fadeRef}
                   className="absolute inset-0 pointer-events-none z-40 rounded-[28px] transition-opacity"

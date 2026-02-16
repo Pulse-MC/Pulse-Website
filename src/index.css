@@ -99,3 +99,13 @@
     scrollbar-width: none;
   }
 }
+
+::selection {
+  background-color: #ff2929;
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background-color: #ff2929;
+  color: #ffffff;
+}

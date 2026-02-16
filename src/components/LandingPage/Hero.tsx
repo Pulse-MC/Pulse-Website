@@ -1,8 +1,7 @@
 import { motion } from 'framer-motion';
-import { Download, ChevronRight, Zap, ZapOff } from 'lucide-react';
+import { Download, ChevronRight, Zap, ZapOff, MessageCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Button from '../global/Button';
-import FloatingLines from '../global/Background';
 import LogoLoop from '../global/LogoLoop';
 import CountUp from '../global/Counter';
 
@@ -36,17 +35,8 @@ export default function Hero({ onDownloadClick }: HeroProps) {
   const [serverStats, setServerStats] = useState<ServerStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [opacity, setOpacity] = useState(0);
-  const [showEffects, setShowEffects] = useState(false); 
 
   useEffect(() => {
-    const savedSetting = localStorage.getItem('pulse_bg_effects');
-    if (savedSetting !== null) {
-      setShowEffects(JSON.parse(savedSetting));
-    } else {
-      const isMobile = window.innerWidth < 768;
-      setShowEffects(!isMobile);
-    }
-
     const fetchServerStats = async () => {
       try {
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -77,51 +67,17 @@ export default function Hero({ onDownloadClick }: HeroProps) {
     fetchServerStats();
   }, []);
 
-  const toggleEffects = () => {
-    const newValue = !showEffects;
-    setShowEffects(newValue);
-    localStorage.setItem('pulse_bg_effects', JSON.stringify(newValue));
-  };
-
   return (
-    // УБРАЛИ px-4 отсюда, чтобы LogoLoop мог быть на всю ширину
-    <section className="relative min-h-screen flex flex-col items-center justify-between overflow-hidden bg-[#0a0a0a]">
-      
-      <button
-        onClick={toggleEffects}
-        className="absolute top-6 right-6 z-50 p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors backdrop-blur-md group"
-        title={showEffects ? "Disable high performance effects" : "Enable background effects"}
-      >
-        {showEffects ? (
-          <Zap className="w-5 h-5 text-[#ff2929]" />
-        ) : (
-          <ZapOff className="w-5 h-5 text-gray-400 group-hover:text-white" />
-        )}
-      </button>
-
+    <section className="pt-16 relative min-h-screen flex flex-col items-center justify-between overflow-hidden bg-[#0a0a0a]">
       <div className="absolute inset-0 z-0 bg-[#060010]">
-        {showEffects ? (
-          <FloatingLines
-            linesGradient={["#a21111","#9b2738","#6b1919"]}
-            animationSpeed={1}
-            interactive={true}
-            bendRadius={5}
-            bendStrength={-0.5}
-            mouseDamping={0.05}
-            parallax
-            parallaxStrength={0.2}
-          />
-        ) : (
           <div className="absolute inset-0 w-full h-full">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
             <div className="absolute bottom-0 left-0 right-0 h-[50vh] bg-gradient-to-t from-[#ff2929]/5 to-transparent" />
           </div>
-        )}
       </div>
 
       <div className="absolute inset-0 bg-gradient-radial from-[#ff2929]/10 via-transparent to-transparent pointer-events-none z-0" />
 
-      {/* Основной контент (Текст, кнопки). Добавили px-4 и w-full сюда */}
       <div className="relative z-10 w-full max-w-6xl mx-auto px-4 text-center pointer-events-none flex-1 flex flex-col justify-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -166,6 +122,12 @@ export default function Hero({ onDownloadClick }: HeroProps) {
           <Button variant="secondary" size="large" icon={ChevronRight} onClick={() => window.open("https://jd.pulsemc.dev", "_blank")}>
             View Documentation
           </Button>
+          <Button 
+            variant="secondary" size="large" icon={MessageCircle} className="hover:border-[#5865F2]/50 hover:bg-[#5865F2]/5 transition-all duration-300"
+            onClick={() => window.open("https://dsc.gg/Pulse-MC", "_blank")}
+          >
+            Join Discord
+          </Button>
         </motion.div>
 
         <motion.div
@@ -207,7 +169,6 @@ export default function Hero({ onDownloadClick }: HeroProps) {
         </motion.div>
       </div>
 
-      {/* Блок с логотипами на всю ширину (w-full и отсутствие px в родителе) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
