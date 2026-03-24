@@ -1,9 +1,11 @@
-import { motion } from 'framer-motion';
-import { Download, ChevronRight, Zap, ZapOff, MessageCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import Button from '../global/Button';
-import LogoLoop from '../global/LogoLoop';
-import CountUp from '../global/Counter';
+import React, { useCallback, useEffect, useState } from 'react';
+import { motion, Variants } from 'framer-motion';
+import { Download, ChevronRight, MessageCircle, Activity, Zap, Server } from 'lucide-react';
+import Button from '../ui/Button';
+import CountUp from '../ui/Counter';
+import MarqueeModule from "react-fast-marquee";
+const Marquee = (MarqueeModule as any).default || MarqueeModule;
+import LightRays from '../ui/Light';
 
 interface HeroProps {
   onDownloadClick: () => void;
@@ -13,182 +15,190 @@ interface ServerStats {
   activeServers: number;
 }
 
-const PaperIcon = () => (
-  <img src='/icons/software/paper.png' className='h-[60px]' alt="Paper" />
-);
-
-const PurpurIcon = () => (
-  <img src='/icons/software/purpur.png' className='h-[60px]' alt="Purpur" /> 
-);
-
-const FabricIcon = () => (
-  <img src='/icons/software/fabric.png' className='h-[60px]' alt="Fabric" />
-);
-
-const techLogos = [
-  { node: <PaperIcon />, title: "Paper", href: "https://papermc.io" },
-  { node: <PurpurIcon />, title: "Purpur", href: "https://purpurmc.org" },
-  { node: <FabricIcon />, title: "Fabric", href: "https://fabricmc.net" },
+const marqueeItems =[
+  "Batching", "Packets", "Network", "Minecraft", "Performance", "New", "Fast"
 ];
 
-export default function Hero({ onDownloadClick }: HeroProps) {
-  const [serverStats, setServerStats] = useState<ServerStats | null>(null);
+function Hero({ onDownloadClick }: HeroProps) {
+  const[serverStats, setServerStats] = useState<ServerStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [opacity, setOpacity] = useState(0);
 
   useEffect(() => {
     const fetchServerStats = async () => {
       try {
-        await new Promise(resolve => setTimeout(resolve, 500));
         const response = await fetch('https://bstats.org/api/v1/plugins/28846/charts/servers/data?maxElements=1');
-        
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
+        if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
+        
         if (Array.isArray(data) && data.length > 0) {
-          const currentCount = data[data.length - 1][1];
-          setServerStats({ activeServers: currentCount });
+          setServerStats({ activeServers: data[data.length - 1][1] });
         } else {
           throw new Error('Invalid data format');
         }
-        
-        setOpacity(1);
       } catch (error) {
         console.error('Failed to fetch server stats:', error);
-        setServerStats({ activeServers: 42 }); 
-        setOpacity(1);
+        setServerStats({ activeServers: 42 }); // Fallback
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchServerStats();
-  }, []);
+  },[]);
+
+  const openDocs = useCallback(() => window.open('https://pulsemc.dev/docs', '_blank'),[]);
+  const openDiscord = useCallback(() => window.open('https://dsc.gg/Pulse-MC', '_blank'),[]);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  };
+
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  };
 
   return (
-    <section className="pt-16 relative min-h-screen flex flex-col items-center justify-between overflow-hidden bg-[#0a0a0a]">
-      <div className="absolute inset-0 z-0 bg-[#060010]">
-          <div className="absolute inset-0 w-full h-full">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-            <div className="absolute bottom-0 left-0 right-0 h-[50vh] bg-gradient-to-t from-[#ff2929]/5 to-transparent" />
-          </div>
+    <section className="relative min-h-screen flex flex-col overflow-hidden bg-[#050505] selection:bg-[#ff2929]/30">
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <LightRays
+          raysOrigin="top-center"
+          raysColor="#ff8080"
+          raysSpeed={1}
+          lightSpread={1}
+          rayLength={2}
+          pulsating={false}
+          fadeDistance={1}
+          saturation={1}
+          followMouse
+          mouseInfluence={0.1}
+          noiseAmount={0}
+          distortion={0}
+        />
+      </div>
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#ff2929]/10 blur-[120px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-1/4 right-[-10%] w-[40%] h-[40%] bg-[#ff2929]/5 blur-[100px] rounded-full mix-blend-screen" />
+        
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:3rem_3rem][mask-image:radial-gradient(ellipse_80%_50%_at_50%_40%,#000_60%,transparent_100%)]" />
       </div>
 
-      <div className="absolute inset-0 bg-gradient-radial from-[#ff2929]/10 via-transparent to-transparent pointer-events-none z-0" />
-
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-4 text-center pointer-events-none flex-1 flex flex-col justify-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="mb-6 pointer-events-auto"
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-32 pb-20 flex-1 flex flex-col lg:flex-row items-center justify-center gap-16">
+        
+        <motion.div 
+          className="flex-1 flex flex-col items-start text-left w-full"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
         >
-          <span className="inline-block px-4 py-2 bg-[#ff2929]/10 border border-[#ff2929]/30 rounded-full text-[#ff2929] text-sm font-semibold mb-6 backdrop-blur-sm">
-            Next-Gen Networking Core
-          </span>
-        </motion.div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-6xl md:text-8xl font-bold mb-6 pointer-events-auto"
-        >
-          <span className="text-white font-syne font-extrabold">Pulse</span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed pointer-events-auto"
-        >
-          Revolutionary packet batching technology that reduces network overhead by{' '}
-          <span className="text-[#ff2929] font-semibold">97%</span> and eliminates lag.
-          Experience Minecraft networking reimagined.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center pointer-events-auto"
-        >
-          <Button onClick={onDownloadClick} variant="primary" size="large" icon={Download}>
-            Download Now
-          </Button>
-          <Button variant="secondary" size="large" icon={ChevronRight} onClick={() => window.open("https://jd.pulsemc.dev", "_blank")}>
-            View Documentation
-          </Button>
-          <Button 
-            variant="secondary" size="large" icon={MessageCircle} className="hover:border-[#5865F2]/50 hover:bg-[#5865F2]/5 transition-all duration-300"
-            onClick={() => window.open("https://dsc.gg/Pulse-MC", "_blank")}
-          >
-            Join Discord
-          </Button>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="mt-16 grid grid-cols-3 gap-8 max-w-3xl mx-auto pointer-events-auto"
-        >
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-[#ff2929] mb-2">
-              <CountUp to={97} duration={2} />%
+          <motion.div variants={itemVariants} className="mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#ff2929]/10 to-transparent border border-[#ff2929]/20 rounded-full">
+              <span className="w-2 h-2 rounded-full bg-[#ff2929] animate-pulse" />
+              <span className="text-[#ff2929] text-sm font-semibold tracking-wide uppercase">Next-Gen Networking Core</span>
             </div>
-            <div className="text-sm text-gray-400">Less Network Traffic</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-[#ff2929] mb-2">
-              <CountUp to={85} duration={2} />%
-            </div>
-            <div className="text-sm text-gray-400">Fewer Syscalls</div>
-          </div>
-          <div className="text-center">
-            <motion.div
-              className="text-3xl md:text-4xl font-bold text-[#ff2929] mb-2"
-              animate={{ opacity }}
-              transition={{ duration: 0.5 }}
-            >
-              {isLoading ? (
-                <span className="text-2xl text-gray-500">Calculating...</span>
-              ) : serverStats ? (
-                <>
-                  <CountUp to={serverStats.activeServers} duration={2} separator="." />
-                </>
-              ) : (
-                <span>N/A</span>
-              )}
-            </motion.div>
-            <div className="text-sm text-gray-400">Active Servers</div>
-          </div>
+          </motion.div>
+
+          <motion.h1 variants={itemVariants} className="text-6xl md:text-8xl font-black mb-6 tracking-tight text-white font-syne">
+            PULSE
+          </motion.h1>
+
+          <motion.p variants={itemVariants} className="text-lg md:text-xl text-gray-400 mb-10 max-w-xl leading-relaxed">
+            Revolutionary packet batching technology that reduces network overhead by <span className="text-white font-bold px-2 py-0.5 rounded">97%</span> and eliminates lag. Experience Minecraft networking reimagined.
+          </motion.p>
+
+          <motion.div variants={itemVariants} className="flex flex-wrap gap-4 w-full sm:w-auto">
+            <Button onClick={onDownloadClick} variant="primary" size="large" icon={Download} className="w-full sm:w-auto shadow-[0_0_30px_-5px_#ff2929]">
+              Download Now
+            </Button>
+            <Button variant="secondary" size="large" icon={ChevronRight} onClick={openDocs} className="w-full sm:w-auto bg-white/5 hover:bg-white/10 border-white/10">
+              Docs
+            </Button>
+            <Button variant="secondary" size="large" icon={MessageCircle} onClick={openDiscord} className="w-full sm:w-auto bg-[#5865F2]/10 hover:bg-[#5865F2]/20 text-[#5865F2] border-[#5865F2]/20">
+              Discord
+            </Button>
+          </motion.div>
         </motion.div>
+
+        {/* <motion.div 
+          className="flex-1 w-full max-w-lg lg:max-w-none relative"
+          initial={{ opacity: 0, scale: 0.9, rotateY: 15 }}
+          animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+          transition={{ duration: 1, delay: 0.2, type: "spring" }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#ff2929]/20 to-transparent rounded-3xl blur-2xl transform rotate-3" />
+          
+          <div className="relative bg-[#0f0f11]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+              <h3 className="text-white font-semibold flex items-center gap-2">
+                <Activity className="w-5 h-5 text-[#ff2929]" /> Live Performance
+              </h3>
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-500/20" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500/20" />
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-6">
+              <div className="bg-white/5 rounded-2xl p-4 border border-white/5 hover:border-[#ff2929]/30 transition-colors">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-400 text-sm flex items-center gap-2"><Zap className="w-4 h-4 text-[#ff2929]"/> Network Traffic</span>
+                  <span className="text-[#ff2929] font-bold">-97%</span>
+                </div>
+                <div className="w-full bg-black/50 rounded-full h-2">
+                  <motion.div initial={{ width: 0 }} animate={{ width: '3%' }} transition={{ duration: 2, delay: 0.5 }} className="bg-[#ff2929] h-2 rounded-full" />
+                </div>
+              </div>
+
+              <div className="bg-white/5 rounded-2xl p-4 border border-white/5 hover:border-[#ff2929]/30 transition-colors">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-400 text-sm flex items-center gap-2"><Activity className="w-4 h-4 text-white"/> Syscalls Reduction</span>
+                  <span className="text-white font-bold">-85%</span>
+                </div>
+                <div className="w-full bg-black/50 rounded-full h-2">
+                  <motion.div initial={{ width: 0 }} animate={{ width: '15%' }} transition={{ duration: 2, delay: 0.7 }} className="bg-white h-2 rounded-full" />
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-[#ff2929]/10 to-transparent rounded-2xl p-6 border border-[#ff2929]/20 text-center mt-2">
+                <Server className="w-8 h-8 text-[#ff2929] mx-auto mb-2 opacity-80" />
+                <div className="text-4xl font-black text-white mb-1 font-syne">
+                  {isLoading ? (
+                    <span className="text-2xl text-gray-500 animate-pulse">...</span>
+                  ) : (
+                    <CountUp to={serverStats?.activeServers || 0} duration={2} separator="." />
+                  )}
+                </div>
+                <div className="text-sm text-[#ff2929] font-medium tracking-wide uppercase">Active Servers</div>
+              </div>
+            </div>
+          </div>
+        </motion.div> */}
       </div>
 
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 0.8 }}
-        className="relative z-10 w-full pb-8 pt-10"
+        className="relative z-20 w-full mt-auto bg-[#0a0a0a]"
       >
-        <LogoLoop
-          logos={techLogos}
-          speed={120}
-          direction="left"
-          logoHeight={48}
-          gap={40}
-          hoverSpeed={0}
-          scaleOnHover
-          fadeOut
-          fadeOutColor="#0a0a0a"
-          ariaLabel="Compatible platforms"
-          className=""
-        />
+        <div className="py-5 border-t border-white/5">
+          <Marquee speed={50} gradient={false} autoFill={true} className="overflow-hidden">
+            <div className="flex items-center">
+              {marqueeItems.map((item, index) => (
+                <div key={index} className="flex items-center">
+                  <span className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-500 to-gray-700 uppercase tracking-widest font-syne px-8 hover:text-white transition-colors duration-300">
+                    {item}
+                  </span>
+                  <img src="/favicon.svg" alt="logo" className="w-8 h-8 md:w-10 md:h-10 opacity-30 grayscale object-contain" />
+                </div>
+              ))}
+            </div>
+          </Marquee>
+        </div>
       </motion.div>
     </section>
   );
 }
+
+export default React.memo(Hero);

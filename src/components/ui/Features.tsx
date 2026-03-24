@@ -106,23 +106,32 @@
       setY.current(pos.current.y);
     }, [shouldDisableAnimations]);
 
+    const rafPending = useRef(false);
+    const targetPos = useRef({ x: 0, y: 0 });
+
     const handleMove = (e: React.PointerEvent) => {
       if (shouldDisableAnimations || !rootRef.current) return;
       const r = rootRef.current.getBoundingClientRect();
-      const targetX = e.clientX - r.left;
-      const targetY = e.clientY - r.top;
+      targetPos.current.x = e.clientX - r.left;
+      targetPos.current.y = e.clientY - r.top;
 
-      gsap.to(pos.current, {
-        x: targetX,
-        y: targetY,
-        duration: damping,
-        ease: 'power3.out',
-        onUpdate: () => {
-          setX.current?.(pos.current.x);
-          setY.current?.(pos.current.y);
-        },
-        overwrite: true
-      });
+      if (!rafPending.current) {
+        rafPending.current = true;
+        requestAnimationFrame(() => {
+          rafPending.current = false;
+          gsap.to(pos.current, {
+            x: targetPos.current.x,
+            y: targetPos.current.y,
+            duration: damping,
+            ease: 'power3.out',
+            onUpdate: () => {
+              setX.current?.(pos.current.x);
+              setY.current?.(pos.current.y);
+            },
+            overwrite: true
+          });
+        });
+      }
 
       if (fadeRef.current) {
           gsap.to(fadeRef.current, { opacity: 0, duration: 0.25, overwrite: true });
@@ -135,6 +144,7 @@
       }
     };
 
+    const cardRafPending = useRef(false);
     const handleCardMove: React.MouseEventHandler<HTMLElement> = (e) => {
       if (shouldDisableAnimations) return;
       const c = e.currentTarget as HTMLElement;
@@ -145,18 +155,24 @@
       c.style.setProperty('--mouse-x', `${x}px`);
       c.style.setProperty('--mouse-y', `${y}px`);
 
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const rotateX = ((y - centerY) / centerY) * -4;
-      const rotateY = ((x - centerX) / centerX) * 4;
+      if (!cardRafPending.current) {
+        cardRafPending.current = true;
+        requestAnimationFrame(() => {
+          cardRafPending.current = false;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -4;
+          const rotateY = ((x - centerX) / centerX) * 4;
 
-      gsap.to(c, {
-        rotateX,
-        rotateY,
-        duration: 0.1,
-        ease: 'power2.out',
-        transformPerspective: 1000
-      });
+          gsap.to(c, {
+            rotateX,
+            rotateY,
+            duration: 0.12,
+            ease: 'power2.out',
+            transformPerspective: 1000
+          });
+        });
+      }
     };
 
     const handleCardLeave: React.MouseEventHandler<HTMLElement> = (e) => {

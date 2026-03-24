@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Hero from '../components/LandingPage/Hero';
 
@@ -22,9 +22,12 @@ function LoadingSpinner() {
 export default function LandingPage() {
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
+  const openDownloadModal = useCallback(() => setIsDownloadModalOpen(true), []);
+  const closeDownloadModal = useCallback(() => setIsDownloadModalOpen(false), []);
+
   return (
     <div className="min-h-screen bg-black text-white">
-      <Hero onDownloadClick={() => setIsDownloadModalOpen(true)} />
+      <Hero onDownloadClick={openDownloadModal} />
 
       <Suspense>
         <Features />
@@ -41,7 +44,7 @@ export default function LandingPage() {
       <Suspense fallback={null}>
         <DownloadModal
           isOpen={isDownloadModalOpen}
-          onClose={() => setIsDownloadModalOpen(false)}
+          onClose={closeDownloadModal}
         />
       </Suspense>
     </div>

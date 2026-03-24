@@ -2,9 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, Check, ChevronRight, Archive, Beaker, Loader2, AlertCircle } from 'lucide-react';
-import Modal from '../global/Modal';
-import Button from '../global/Button';
+import Modal from '../ui/Modal';
+import Button from '../ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '@/config/apiconfig';
 
 interface DownloadModalProps {
   isOpen: boolean;
@@ -97,7 +98,7 @@ export default function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
       setIsLoading(true);
       setError(false);
       setIsDownloading(false);
-      fetch('https://api.pulsemc.dev/releases')
+      fetch(`${BASE_URL}/releases`)
         .then((res) => {
           if (!res.ok) throw new Error('Failed to fetch');
           return res.json();
@@ -174,15 +175,15 @@ export default function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
     if (matchingReleases.length === 0) return null;
 
     const latestBuild = matchingReleases.sort((a, b) => {
-      const buildA = (a.build_id) || 0;
-      const buildB = (b.build_id) || 0;
+      const buildA = (a.build_id) || "0";
+      const buildB = (b.build_id) || "0";
       return parseInt(buildB) - parseInt(buildA);
     })[0];
 
     if (!latestBuild) return null;
 
     return {
-      link: `https://api.pulsemc.dev/release/download/${latestBuild.build_id}` || '404',
+      link: `${BASE_URL}/release/download/${latestBuild.build_id}` || '404',
       size: latestBuild.size || latestBuild.file_size || "0",
       date: latestBuild.releaseDate || latestBuild.release_date || new Date().toISOString().split('T')[0]
     };

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import MagicBento from '../global/Features';
+import MagicBento from '../ui/Features';
 
 export default function Features() {
   return (

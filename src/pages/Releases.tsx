@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, Package, Calendar, ChevronLeft, AlertCircle, ChevronDown, ChevronUp, Layers, FileDigit } from 'lucide-react';
-import Button from '../components/global/Button';
-import Card from '../components/global/Card';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
 import { BASE_URL } from '@/config/apiconfig';
 
 interface Release {

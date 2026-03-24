@@ -215,8 +215,8 @@ const ConsoleDemo = () => {
 };
 
 const CPULoadDemo = () => {
-    const [vInterrupts, setVInterrupts] = useState<number[]>([]);
-    const [pInterrupts, setPInterrupts] = useState<number[]>([]);
+    const [vInterrupts, setVInterrupts] = useState<string[]>([]);
+    const [pInterrupts, setPInterrupts] = useState<string[]>([]);
     const [vCount, setVCount] = useState(0);
     const [pCount, setPCount] = useState(0);
 
