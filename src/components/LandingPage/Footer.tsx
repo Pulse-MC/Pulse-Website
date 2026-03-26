@@ -33,12 +33,14 @@ export default function Footer() {
             <h4 className={`text-white font-semibold mb-6 font-syne ${isMobile ? 'text-base' : ''}`}>Product</h4>
             <ul className={isMobile ? 'space-y-3' : 'space-y-4'}>
               <FooterLink href="https://jd.pulsemc.dev/" isExternal isMobile={isMobile}>JavaDocs</FooterLink>
-              <FooterLink href="https://github.com/Pulse-MC/Pulse-Paper/blob/main/README.md" isExternal isMobile={isMobile}>Benchmarks</FooterLink>
+              <FooterLink href="/docs" isMobile={isMobile}>Documentation</FooterLink>
+              <FooterLink href="https://github.com/Pulse-MC/Pulse/blob/main/README.md" isExternal isMobile={isMobile}>Benchmarks</FooterLink>
               <FooterLink href="https://bstats.org/plugin/server-implementation/Pulse" isExternal isMobile={isMobile}>bStats</FooterLink>
               <FooterLink href="/releases" isMobile={isMobile}>Releases</FooterLink>
               <FooterLink href="/devbuilds" isMobile={isMobile}>Devbuilds</FooterLink>
             </ul>
           </div>
+          
 
           <div>
             <h4 className={`text-white font-semibold mb-6 font-syne ${isMobile ? 'text-base' : ''}`}>Company</h4>
@@ -63,7 +65,7 @@ export default function Footer() {
         </div>
 
         <div className={`border-t border-white/10 pt-8 flex justify-between items-center gap-4 text-gray-500 ${isMobile ? 'pb-24 flex-col text-center text-[10px]' : 'pb-32 md:pb-40 flex-col md:flex-row text-xs'}`}>
-          <p>© 2026 PulseMC. All rights reserved.</p>
+          <p>© 2026 PulseMC Team & Contributors. All rights reserved.</p>
           <p className={`opacity-60 ${isMobile ? '' : 'text-center md:text-right'}`}>
             NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
           </p>

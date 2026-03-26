@@ -23,7 +23,6 @@ export interface CategoryMeta {
   emoji?: string;
 }
 
-// Загружаем файлы
 const modules = import.meta.glob('./pages/**/*.tsx', { eager: true });
 const metaModules = import.meta.glob('./pages/**/_category.ts', { eager: true });
 
@@ -65,7 +64,6 @@ class DocsRegistry {
   getPages() { return this.pages; }
   getPage(path: string | undefined) { return this.pages.find(p => p.path === path); }
   getCategoryPriority(categoryName: string): number {
-    // Ищем приоритет по имени категории (name)
     const foundMeta = Object.values(this.categoriesMeta).find(m => m.name === categoryName);
     return foundMeta ? foundMeta.priority : 999;
   }

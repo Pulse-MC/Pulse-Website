@@ -4,7 +4,7 @@ export default function GettingStarted() {
   return (
     <div className="space-y-6 text-gray-300 prose prose-invert max-w-none">
       <p className="text-lg">
-        Welcome to the PulseMC ecosystem. Setting up your high-performance server takes only a few minutes.
+        Welcome to the Pulse ecosystem. Setting up your high-performance server takes only a few minutes.
       </p>
 
       <h2 id="requirements" className="!text-white">System Requirements</h2>
@@ -27,7 +27,7 @@ export default function GettingStarted() {
         <li>Place the JAR file in a new, empty directory dedicated to your server.</li>
         <li>
           Continue following the instructions in
-          <TextLink href="https://docs.papermc.io/paper/getting-started/#running-the-server" inNewTab={true} > Paper's guide </TextLink>.
+          <TextLink href="https://docs.papermc.io/paper/getting-started/#running-the-server" inNewTab > Paper's guide </TextLink>.
         </li>
       </ol>
 

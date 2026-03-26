@@ -4,7 +4,7 @@ export default function Overview() {
   return (
     <div className="space-y-6 text-gray-300 prose prose-invert max-w-none">
       <p className="text-lg leading-relaxed">
-        <strong>PulseMC</strong> is a high-performance Minecraft server implementation designed to solve the fundamental inefficiencies of the Minecraft networking stack. 
+        <strong>Pulse</strong> is a high-performance Minecraft server implementation designed to solve the fundamental inefficiencies of the Minecraft networking stack. 
         While traditional servers focus almost entirely on CPU logic and entity ticking, Pulse optimizes the <b>transport layer</b> to handle massive player counts and extreme-load environments without breaking a sweat.
       </p>
 
